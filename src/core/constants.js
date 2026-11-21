@@ -12,5 +12,7 @@ export const MAX_CAPSULES = 100;
 export const MAX_TITLE = 80;
 export const MAX_NOTE = 500;
 export const MAX_MESSAGE = 5000;
+export const MAX_REFLECTION = 1000;
+export const MAX_REFLECTIONS = 2000;
 export const DEFAULT_LOCALE = 'en';
 export const DEFAULT_THEME = 'dark';

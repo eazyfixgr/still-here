@@ -1,10 +1,17 @@
 import en from './locales/en.js';
 import el from './locales/el.js';
+import enLaunch from './locales/en.launch.js';
+import elLaunch from './locales/el.launch.js';
 import { DEFAULT_LOCALE } from './constants.js';
 
+export const MESSAGES = {
+  en: { ...en, ...enLaunch },
+  el: { ...el, ...elLaunch },
+};
+
 export const LANGUAGES = [
-  { code: 'en', name: 'English', locale: 'en-GB', messages: en },
-  { code: 'el', name: 'Ελληνικά', locale: 'el-GR', messages: el },
+  { code: 'en', name: 'English', locale: 'en-GB', messages: MESSAGES.en },
+  { code: 'el', name: 'Ελληνικά', locale: 'el-GR', messages: MESSAGES.el },
 ];
 
 const languageMap = new Map(LANGUAGES.map((language) => [language.code, language]));

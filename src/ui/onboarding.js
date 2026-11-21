@@ -1,4 +1,4 @@
-import { button, el, option } from './dom.js';
+import { append, button, el, option } from './dom.js';
 import { brand } from './brand.js';
 import { icon } from './icons.js';
 import { languageSelect } from './components/language-select.js';
@@ -9,6 +9,7 @@ import { scenarioFor } from '../core/model.js';
 import { birthBounds, validBirth, birthMs } from '../core/dates.js';
 import { baselineLabel, formatDate, formatNumber } from '../core/format.js';
 import { YEAR } from '../core/constants.js';
+import { momentFor, validMomentDate } from '../core/moments.js';
 
 function landingHeader({ locale, theme, onLocaleChange, onThemeToggle }) {
   const dark = theme === 'dark';
@@ -35,7 +36,7 @@ function landingHeader({ locale, theme, onLocaleChange, onThemeToggle }) {
   );
 }
 
-function heroCopy() {
+function heroCopy({ onStartHere, onDemo }) {
   return el(
     'div',
     { class: 'hero-copy' },
@@ -48,6 +49,13 @@ function heroCopy() {
       el('em', null, t('heroTitleB')),
     ),
     el('p', { class: 'hero-lede' }, t('heroCopy')),
+    el(
+      'div',
+      { class: 'hero-actions' },
+      button(t('startHere'), { class: 'btn btn-primary btn-large', onclick: onStartHere }, icon('arrow', { size: 17 })),
+      button(t('tryDemo'), { class: 'btn btn-ghost btn-large', onclick: onDemo }, icon('play', { size: 15 })),
+    ),
+    el('p', { class: 'demo-hint' }, t('demoHint')),
     el(
       'div',
       { class: 'hero-tags' },
@@ -63,8 +71,36 @@ function featureCards() {
     'section',
     { class: 'feature-grid', 'aria-label': t('gameRulesTitle') },
     el('article', { class: 'feature-card' }, icon('overview', { size: 22 }), el('h2', null, t('featureTimeTitle')), el('p', null, t('featureTimeCopy'))),
+    el('article', { class: 'feature-card' }, icon('info', { size: 22 }), el('h2', null, t('featureMomentTitle')), el('p', null, t('featureMomentCopy'))),
     el('article', { class: 'feature-card' }, icon('shield', { size: 22 }), el('h2', null, t('featurePrivateTitle')), el('p', null, t('featurePrivateCopy'))),
-    el('article', { class: 'feature-card' }, icon('info', { size: 22 }), el('h2', null, t('featureScenarioTitle')), el('p', null, t('featureScenarioCopy'))),
+  );
+}
+
+function sharedMomentCard(date, onStartHere, onShareMoment) {
+  if (!validMomentDate(date)) return null;
+  const moment = momentFor(date);
+  return el(
+    'section',
+    { class: 'shared-moment', 'aria-labelledby': 'shared-moment-title' },
+    el(
+      'div',
+      { class: 'shared-moment-copy' },
+      el('div', { class: 'eyebrow' }, t('sharedMomentEyebrow')),
+      el('h2', { id: 'shared-moment-title' }, t('sharedMomentTitle')),
+      el('blockquote', null, t(moment.key)),
+      el('p', null, t('sharedMomentCopy')),
+    ),
+    el(
+      'div',
+      { class: 'shared-moment-side' },
+      el('span', { class: 'shared-moment-date' }, formatDate(new Date(`${date}T12:00:00`).getTime())),
+      el(
+        'div',
+        { class: 'shared-moment-actions' },
+        button(t('sharedMomentCta'), { class: 'btn btn-primary', onclick: onStartHere }, icon('arrow', { size: 16 })),
+        button(t('momentShare'), { class: 'btn btn-ghost', onclick: () => onShareMoment(date) }, icon('share', { size: 15 })),
+      ),
+    ),
   );
 }
 
@@ -302,9 +338,13 @@ export function renderOnboarding({
   onDraft,
   onStep,
   onStart,
+  onDemo,
+  onShareMoment,
+  onInfo,
   onLocaleChange,
   onThemeToggle,
   onImport,
+  sharedMomentDate,
 }) {
   const errorNode = el('p', { class: 'form-error', role: 'alert', tabindex: '-1' });
   const showError = (message) => {
@@ -313,7 +353,16 @@ export function renderOnboarding({
   };
 
   const root = el('div', { class: 'landing' });
-  root.append(
+  const startHere = () => {
+    const card = root.querySelector('.setup-card');
+    card?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    window.setTimeout(() => root.querySelector('#player-name')?.focus({ preventScroll: true }), 350);
+  };
+  const sharedMoment = sharedMomentCard(sharedMomentDate, startHere, onShareMoment);
+  const heroPanel = heroCopy({ onStartHere: startHere, onDemo });
+  if (sharedMoment) heroPanel.append(sharedMoment);
+  append(
+    root,
     landingHeader({ locale, theme, onLocaleChange, onThemeToggle }),
     el(
       'main',
@@ -322,7 +371,7 @@ export function renderOnboarding({
       el(
         'section',
         { class: 'hero', 'aria-labelledby': 'hero-title' },
-        heroCopy(),
+        heroPanel,
         el(
           'div',
           { class: 'setup-card' },
@@ -402,7 +451,18 @@ export function renderOnboarding({
         ),
       ),
       featureCards(),
-      el('footer', { class: 'landing-footer' }, el('span', null, t('footerTagline')), el('span', { class: 'footer-note' }, t('entertainmentNote'))),
+      el(
+        'footer',
+        { class: 'landing-footer' },
+        el('span', null, t('footerTagline')),
+        el(
+          'div',
+          { class: 'footer-links' },
+          button(t('aboutPrivacyLink'), { class: 'text-button', onclick: onInfo }),
+          el('a', { href: 'https://github.com/eazyfixgr/still-here/issues', target: '_blank', rel: 'noopener noreferrer' }, t('feedbackLink')),
+        ),
+        el('span', { class: 'footer-note' }, t('entertainmentNote')),
+      ),
     ),
   );
   return { root, showError };

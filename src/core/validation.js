@@ -6,6 +6,8 @@ import {
   MAX_MESSAGE,
   MAX_NAME,
   MAX_NOTE,
+  MAX_REFLECTION,
+  MAX_REFLECTIONS,
   MAX_TITLE,
   YEAR,
 } from './constants.js';
@@ -13,6 +15,7 @@ import { validBirth } from './dates.js';
 import { isValidHabitValue, HABITS } from '../data/habits.js';
 import { findBaseline } from '../data/baselines.js';
 import { isLanguage } from './i18n.js';
+import { validMomentDate } from './moments.js';
 
 function isObject(value) {
   return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
@@ -34,7 +37,7 @@ function validMilestone(milestone, birth, now) {
   return (
     isObject(milestone) &&
     isText(milestone.id, 8, 80) &&
-    milestone.id.startsWith('custom-') &&
+    /^custom-[A-Za-z0-9-]+$/.test(milestone.id) &&
     isText(milestone.title, 1, MAX_TITLE) &&
     isText(milestone.note ?? '', 0, MAX_NOTE) &&
     isFiniteNumber(milestone.at) &&
@@ -50,7 +53,7 @@ function validCapsule(capsule, now) {
   return (
     isObject(capsule) &&
     isText(capsule.id, 9, 80) &&
-    capsule.id.startsWith('capsule-') &&
+    /^capsule-[A-Za-z0-9-]+$/.test(capsule.id) &&
     isText(capsule.title, 1, MAX_TITLE) &&
     isText(capsule.message, 1, MAX_MESSAGE) &&
     isFiniteNumber(capsule.openAt) &&
@@ -68,6 +71,7 @@ export function validateGame(game, now = Date.now()) {
   if (!isObject(game.earned) || Array.isArray(game.earned)) return false;
   if (!Array.isArray(game.customMilestones) || !Array.isArray(game.capsules)) return false;
   if (!isObject(game.settings) || !isObject(game.meta)) return false;
+  if (game.reflections !== undefined && !isObject(game.reflections)) return false;
 
   const profile = game.profile;
   if (typeof profile.name !== 'string' || profile.name.length > MAX_NAME) return false;
@@ -109,6 +113,12 @@ export function validateGame(game, now = Date.now()) {
     if (!validCapsule(capsule, now)) return false;
   }
   if (!uniqueIds(game.capsules)) return false;
+
+  const reflections = Object.entries(game.reflections ?? {});
+  if (reflections.length > MAX_REFLECTIONS) return false;
+  for (const [date, text] of reflections) {
+    if (!validMomentDate(date) || !isText(text, 0, MAX_REFLECTION)) return false;
+  }
 
   if (!isLanguage(game.settings.locale)) return false;
   if (!['dark', 'light'].includes(game.settings.theme)) return false;
@@ -162,6 +172,11 @@ export function sanitizeGame(game) {
     createdAt: capsule.createdAt,
     openedAt: capsule.openedAt ?? null,
   }));
+  const reflections = Object.fromEntries(
+    Object.entries(game.reflections ?? {})
+      .filter(([date, text]) => validMomentDate(date) && typeof text === 'string')
+      .map(([date, text]) => [date, text.slice(0, MAX_REFLECTION)]),
+  );
   return {
     version: APP_VERSION,
     model: GAME_MODEL,
@@ -171,6 +186,7 @@ export function sanitizeGame(game) {
     earned,
     customMilestones,
     capsules,
+    reflections,
     settings: {
       locale: game.settings.locale,
       theme: game.settings.theme,

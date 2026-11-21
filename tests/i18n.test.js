@@ -1,7 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import en from '../src/core/locales/en.js';
-import el from '../src/core/locales/el.js';
+import { MESSAGES } from '../src/core/i18n.js';
 
 function duplicateKeys(path) {
   const source = readFileSync(path, 'utf8');
@@ -16,23 +15,26 @@ function duplicateKeys(path) {
 
 describe('translations', () => {
   it('keeps the same keys in English and Greek', () => {
-    expect(Object.keys(el).sort()).toEqual(Object.keys(en).sort());
+    expect(Object.keys(MESSAGES.el).sort()).toEqual(Object.keys(MESSAGES.en).sort());
   });
 
   it('does not define duplicate keys', () => {
-    expect(duplicateKeys('src/core/locales/en.js')).toEqual([]);
-    expect(duplicateKeys('src/core/locales/el.js')).toEqual([]);
+    for (const file of ['en', 'el', 'en.launch', 'el.launch']) {
+      expect(duplicateKeys(`src/core/locales/${file}.js`), file).toEqual([]);
+    }
   });
 
   it('keeps placeholders in sync', () => {
-    for (const key of Object.keys(en)) {
-      const enTokens = (en[key].match(/\{\w+\}/g) ?? []).sort();
-      const elTokens = (el[key].match(/\{\w+\}/g) ?? []).sort();
+    for (const key of Object.keys(MESSAGES.en)) {
+      const enTokens = (MESSAGES.en[key].match(/\{\w+\}/g) ?? []).sort();
+      const elTokens = (MESSAGES.el[key].match(/\{\w+\}/g) ?? []).sort();
       expect(elTokens, key).toEqual(enTokens);
     }
   });
 
   it('does not leave untranslated Latin lookalike fragments in Greek copy', () => {
-    expect(JSON.stringify(el)).not.toContain('κopia');
+    expect(JSON.stringify(MESSAGES.el)).not.toContain('κopia');
+    expect(MESSAGES.el.heroCopy).toMatch(/[Α-ω]/);
+    expect(MESSAGES.el.shareTitle).toMatch(/[Α-ω]/);
   });
 });

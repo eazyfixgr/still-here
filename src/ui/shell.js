@@ -60,6 +60,8 @@ export function renderShell({
   route,
   theme,
   locale,
+  demo,
+  onStartOwn,
   onLocaleChange,
   onThemeToggle,
   storageError,
@@ -67,7 +69,7 @@ export function renderShell({
   const dueCount = capsulesDue(game).length;
   const age = Math.floor(ageAt(Date.now(), game.profile.birth));
   const profileName = game.profile.name || t('thisJourney');
-  const saveLabel = storageError ? t('storageError') : t('localOnDevice');
+  const saveLabel = demo ? t('demoNotSaved') : storageError ? t('storageError') : t('localOnDevice');
 
   const root = el('div', { class: 'app-shell' });
   const header = el(
@@ -82,9 +84,9 @@ export function renderShell({
         { class: 'header-actions' },
         el(
           'span',
-          { class: `save-pill${storageError ? ' has-error' : ''}`, title: saveLabel },
+          { class: `save-pill${storageError ? ' has-error' : ''}${demo ? ' is-demo' : ''}`, title: saveLabel },
           el('span', { class: 'save-dot', 'aria-hidden': 'true' }),
-          el('span', { class: 'save-text' }, storageError ? t('saveIssue') : t('localOnDevice')),
+          el('span', { class: 'save-text' }, demo ? t('demoNotSaved') : storageError ? t('saveIssue') : t('localOnDevice')),
         ),
         languageControl(locale, onLocaleChange),
         themeButton(theme, onThemeToggle),
@@ -118,14 +120,25 @@ export function renderShell({
     el(
       'div',
       { class: 'sidebar-foot' },
-      el('div', { class: 'local-note' }, icon('shield', { size: 16 }), el('span', null, t('localPrivacyNote'))),
+      el('div', { class: 'local-note' }, icon('shield', { size: 16 }), el('span', null, demo ? t('demoHint') : t('localPrivacyNote'))),
     ),
   );
+
+  const demoBanner = demo
+    ? el(
+        'div',
+        { class: 'demo-banner', role: 'status' },
+        el('span', { class: 'pill accent-pill' }, t('demoLabel')),
+        el('div', { class: 'demo-banner-copy' }, el('strong', null, t('demoBannerTitle')), el('span', null, t('demoBannerCopy'))),
+        el('button', { class: 'btn btn-primary btn-small', type: 'button', onclick: onStartOwn }, t('demoStartMine')),
+      )
+    : null;
 
   const main = el(
     'main',
     { id: 'main', class: 'app-main', tabindex: '-1' },
     storageError ? el('div', { class: 'alert-banner', role: 'alert' }, t(storageError)) : null,
+    demoBanner,
     el('div', { id: 'view-root', class: 'view-root' }),
     el(
       'footer',

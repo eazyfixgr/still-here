@@ -6,10 +6,11 @@ import {
   migrateLegacyGame,
   openCapsule,
   removeCustomMilestone,
+  saveReflection,
   validateImport,
 } from '../src/core/game.js';
 import { DEFAULT_HABITS } from '../src/data/habits.js';
-import { validateGame, validateLegacyGame } from '../src/core/validation.js';
+import { sanitizeGame, validateGame, validateLegacyGame } from '../src/core/validation.js';
 import { syncAchievements } from '../src/core/achievements.js';
 
 const NOW = new Date(2026, 0, 15, 12, 0, 0).getTime();
@@ -37,6 +38,21 @@ describe('game state', () => {
     const fresh = syncAchievements(game, NOW);
     expect(fresh.length).toBeGreaterThan(0);
     expect(validateGame(game, NOW)).toBe(true);
+  });
+
+  it('keeps private daily answers without putting them in old saves', () => {
+    const game = makeGame();
+    expect(saveReflection(game, '2026-01-15', 'A private answer', NOW)).toBe(true);
+    expect(game.reflections['2026-01-15']).toBe('A private answer');
+    expect(validateGame(game, NOW)).toBe(true);
+    expect(saveReflection(game, 'not-a-date', 'x', NOW)).toBe(false);
+    saveReflection(game, '2026-01-15', '', NOW);
+    expect(game.reflections['2026-01-15']).toBeUndefined();
+
+    const older = makeGame();
+    delete older.reflections;
+    expect(validateGame(older, NOW)).toBe(true);
+    expect(sanitizeGame(older).reflections).toEqual({});
   });
 
   it('adds and removes custom milestones', () => {

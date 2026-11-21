@@ -9,7 +9,7 @@ import {
 } from '../../core/achievements.js';
 import { formatDate, formatNumber, formatPercent } from '../../core/format.js';
 
-function createCard(item, game, now, onDelete) {
+function createCard(item, game, now, onDelete, onShare) {
   const earned = isEarned(game, item.id);
   const card = el('article', { class: `achievement-card ${earned ? 'is-unlocked' : 'is-locked'}${item.kind === 'custom' ? ' is-custom' : ''}` });
   const title = el('h3', { class: 'achievement-title' }, item.title);
@@ -32,9 +32,12 @@ function createCard(item, game, now, onDelete) {
       card,
       el('div', { class: 'achievement-foot' },
         el('span', { class: 'achievement-date' }, already ? t('alreadyLived') : t('earnedOn', { date: formatDate(game.earned[item.id] ?? item.at, { short: true }) })),
-        item.kind === 'custom'
-          ? button('', { class: 'icon-button tiny', 'aria-label': t('deleteMilestone'), title: t('deleteMilestone'), onclick: () => onDelete(item.id) }, icon('trash', { size: 15 }))
-          : null,
+        el('div', { class: 'achievement-actions' },
+          button('', { class: 'icon-button tiny', 'aria-label': t('shareShort'), title: t('shareShort'), onclick: () => onShare(item) }, icon('share', { size: 15 })),
+          item.kind === 'custom'
+            ? button('', { class: 'icon-button tiny', 'aria-label': t('deleteMilestone'), title: t('deleteMilestone'), onclick: () => onDelete(item.id) }, icon('trash', { size: 15 }))
+            : null,
+        ),
       ),
     );
   } else {
@@ -54,7 +57,7 @@ function createCard(item, game, now, onDelete) {
   return card;
 }
 
-export function renderMilestones({ game, onAddMilestone, onDeleteMilestone }) {
+export function renderMilestones({ game, onAddMilestone, onDeleteMilestone, onShareMilestone }) {
   const all = buildAchievements(game);
   const total = all.length;
   const unlocked = all.filter((item) => isEarned(game, item.id)).length;
@@ -112,7 +115,7 @@ export function renderMilestones({ game, onAddMilestone, onDeleteMilestone }) {
       grid.append(el('div', { class: 'empty-state' }, icon('milestones', { size: 26 }), el('p', null, message)));
       return;
     }
-    for (const item of visible) grid.append(createCard(item, game, Date.now(), onDeleteMilestone));
+    for (const item of visible) grid.append(createCard(item, game, Date.now(), onDeleteMilestone, onShareMilestone));
   }
 
   draw();

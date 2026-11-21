@@ -1,6 +1,17 @@
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
 const ICONS = {
+  share: [
+    ['circle', { cx: 18, cy: 5, r: 3 }],
+    ['circle', { cx: 6, cy: 12, r: 3 }],
+    ['circle', { cx: 18, cy: 19, r: 3 }],
+    ['path', { d: 'M8.6 10.5l6.8-4M8.6 13.5l6.8 4' }],
+  ],
+  calendar: [
+    ['rect', { x: 3, y: 5, width: 18, height: 16, rx: 2 }],
+    ['path', { d: 'M7 3v4M17 3v4M3 11h18M8 16h2M14 16h2' }],
+  ],
+  play: [['path', { d: 'M8 4l12 8-12 8z' }]],
   overview: [
     ['circle', { cx: 12, cy: 12, r: 8.5 }],
     ['path', { d: 'M12 7.5v5l3 2' }],

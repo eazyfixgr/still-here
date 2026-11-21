@@ -1,9 +1,10 @@
-import { APP_VERSION, GAME_MODEL, MAX_CAPSULES, MAX_CUSTOM_MILESTONES } from './constants.js';
+import { APP_VERSION, GAME_MODEL, MAX_CAPSULES, MAX_CUSTOM_MILESTONES, MAX_REFLECTION } from './constants.js';
 import { birthMs, validBirth } from './dates.js';
 import { scenarioFor, baselineE0, lifestyleModifier } from './model.js';
 import { DEFAULT_HABITS, habitPoints } from '../data/habits.js';
 import { DEFAULT_BASELINE, findBaseline } from '../data/baselines.js';
 import { sanitizeGame, validateGame, validateLegacyGame } from './validation.js';
+import { validMomentDate } from './moments.js';
 
 function createId(prefix) {
   const suffix = globalThis.crypto?.randomUUID?.() ?? `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
@@ -27,6 +28,7 @@ export function createGame(profile, habits, settings, now = Date.now()) {
     earned: {},
     customMilestones: [],
     capsules: [],
+    reflections: {},
     settings: {
       locale: settings.locale,
       theme: settings.theme,
@@ -72,6 +74,7 @@ export function migrateLegacyGame(legacy, prefs, now = Date.now()) {
     earned: { ...legacy.earned },
     customMilestones: [],
     capsules: [],
+    reflections: {},
     settings: {
       locale: prefs.locale,
       theme: prefs.theme,
@@ -190,6 +193,17 @@ export function nextSealedCapsule(game) {
   return [...game.capsules]
     .filter((capsule) => !capsule.openedAt)
     .sort((a, b) => a.openAt - b.openAt)[0] ?? null;
+}
+
+export function saveReflection(game, date, text, now = Date.now()) {
+  if (!validMomentDate(date)) return false;
+  const clean = String(text || '').trim();
+  if (clean.length > MAX_REFLECTION) return false;
+  game.reflections ??= {};
+  if (clean) game.reflections[date] = clean;
+  else delete game.reflections[date];
+  game.meta.lastSeen = now;
+  return true;
 }
 
 export function createSettingsPrefs(settings) {

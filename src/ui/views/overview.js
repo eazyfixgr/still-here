@@ -10,6 +10,7 @@ import {
   nextAchievement,
 } from '../../core/achievements.js';
 import { nextSealedCapsule } from '../../core/game.js';
+import { lifeInNumbers, momentFor, validMomentDate, yearInDays } from '../../core/moments.js';
 import {
   baselineLabel,
   clamp,
@@ -159,7 +160,120 @@ function capsuleCard(game, now) {
   };
 }
 
-function atAGlance(game, now) {
+function dailyQuestionCard(game, sharedMomentDate, onShare, onSaveReflection, onOpenArchive) {
+  const date = validMomentDate(sharedMomentDate) ? sharedMomentDate : null;
+  const moment = momentFor(date ?? undefined);
+  const shared = Boolean(date);
+  const existing = game.reflections?.[moment.date] ?? '';
+  const answerCount = Object.keys(game.reflections ?? {}).length;
+  const textarea = el('textarea', {
+    id: 'daily-reflection',
+    class: 'input textarea reflection-input',
+    maxlength: '1000',
+    rows: '3',
+    placeholder: t('reflectionPlaceholder'),
+    value: existing,
+  });
+  const form = el(
+    'form',
+    {
+      class: 'reflection-form',
+      onsubmit: (event) => {
+        event.preventDefault();
+        onSaveReflection(moment.date, textarea.value);
+      },
+    },
+    el('label', { class: 'sr-only', for: 'daily-reflection' }, t('reflectionSummary')),
+    textarea,
+    el(
+      'div',
+      { class: 'reflection-actions' },
+      el('span', { class: 'reflection-hint' }, icon('lock', { size: 14 }), t('reflectionHint')),
+      button(t('saveReflection'), { class: 'btn btn-ghost btn-small', type: 'submit' }, icon('check', { size: 15 })),
+    ),
+  );
+  return el(
+    'section',
+    { class: 'card daily-card' },
+    el(
+      'div',
+      { class: 'daily-card-head' },
+      el('div', { class: 'eyebrow' }, t(shared ? 'sharedMomentEyebrow' : 'momentEyebrow')),
+      shared ? el('span', { class: 'pill accent-pill' }, t('momentShared')) : el('span', { class: 'daily-date' }, formatDate(new Date(`${moment.date}T12:00:00`).getTime(), { short: true })),
+    ),
+    el('blockquote', { class: 'daily-question' }, t(moment.key)),
+    el(
+      'div',
+      { class: 'daily-card-foot' },
+      el('p', null, t('momentCopy')),
+      el(
+        'div',
+        { class: 'daily-actions' },
+        answerCount > 0
+          ? button(`${t('pastAnswers')} (${formatNumber(answerCount)})`, { class: 'btn btn-ghost btn-small', onclick: onOpenArchive }, icon('capsules', { size: 15 }))
+          : null,
+        button(t('momentShare'), { class: 'btn btn-ghost btn-small', onclick: () => onShare({ kind: 'moment', momentDate: moment.date }) }, icon('share', { size: 15 })),
+      ),
+    ),
+    el(
+      'details',
+      { class: 'reflection-box', open: Boolean(existing) },
+      el('summary', null, icon(existing ? 'check' : 'lock', { size: 15 }), t(existing ? 'reflectionSummary' : 'reflectionSummaryEmpty')),
+      form,
+    ),
+  );
+}
+
+function lifeNumbersCard(game, now, onShare) {
+  const numbers = lifeInNumbers(game.profile.birth, now);
+  return el(
+    'article',
+    { class: 'card numbers-card' },
+    el('div', { class: 'eyebrow' }, t('perspectiveEyebrow')),
+    el('h2', null, t('lifeNumbersTitle')),
+    el('p', { class: 'muted-copy' }, t('lifeNumbersCopy')),
+    el(
+      'div',
+      { class: 'numbers-grid' },
+      el('div', null, el('strong', null, formatNumber(numbers.days)), el('span', null, t('metricDays'))),
+      el('div', null, el('strong', null, formatNumber(numbers.weeks)), el('span', null, t('metricWeeks'))),
+      el('div', null, el('strong', null, formatNumber(numbers.days * 24)), el('span', null, t('metricHours'))),
+      el('div', { class: 'numbers-next' },
+        el('strong', null, t('lifeNextRoundValue', { days: formatNumber(numbers.daysToRound) })),
+        el('span', null, t('lifeNextRound')),
+        el('small', null, t('lifeNextRoundDate', { date: formatDate(numbers.roundDate, { short: true }) })),
+      ),
+    ),
+    button(t('shareDaysButton'), { class: 'btn btn-primary btn-small', onclick: () => onShare({ kind: 'days' }) }, icon('share', { size: 15 })),
+  );
+}
+
+function yearMosaicCard(now) {
+  const info = yearInDays(now);
+  const grid = el('div', { class: 'year-mosaic', role: 'img', 'aria-label': t('yearMosaicAria', { day: formatNumber(info.day), total: formatNumber(info.total), year: formatNumber(info.year) }) });
+  for (let day = 1; day <= info.total; day += 1) {
+    const state = day < info.day ? 'is-past' : day === info.day ? 'is-today' : 'is-future';
+    grid.append(el('span', { class: `mosaic-dot ${state}`, 'aria-hidden': 'true' }));
+  }
+  return el(
+    'article',
+    { class: 'card mosaic-card' },
+    el('div', { class: 'eyebrow' }, t('perspectiveEyebrow')),
+    el('h2', null, t('yearMosaicTitle')),
+    el('p', { class: 'muted-copy' }, t('yearMosaicCopy')),
+    grid,
+    el(
+      'div',
+      { class: 'mosaic-legend' },
+      el('span', null, el('i', { class: 'is-past', 'aria-hidden': 'true' }), t('yearMosaicPast')),
+      el('span', null, el('i', { class: 'is-today', 'aria-hidden': 'true' }), t('yearMosaicToday')),
+      el('span', null, el('i', { class: 'is-future', 'aria-hidden': 'true' }), t('yearMosaicAhead')),
+      el('strong', null, t('yearMosaicDay', { day: formatNumber(info.day), total: formatNumber(info.total) })),
+    ),
+  );
+}
+
+function atAGlance(game, now, demo) {
   const age = Math.floor(ageAt(now, game.profile.birth));
   const birthday = nextBirthdayMs(game.profile.birth, now);
   const birthdayDays = daysUntil(birthday, now);
@@ -171,7 +285,7 @@ function atAGlance(game, now) {
   return el(
     'article',
     { class: 'card glance-card' },
-    el('div', { class: 'card-head' }, el('h2', null, t('thisJourney')), el('span', { class: 'pill' }, t('savedLocally'))),
+    el('div', { class: 'card-head' }, el('h2', null, t('thisJourney')), el('span', { class: 'pill' }, demo ? t('demoLabel') : t('savedLocally'))),
     el(
       'dl',
       { class: 'glance-list' },
@@ -183,7 +297,7 @@ function atAGlance(game, now) {
   );
 }
 
-export function renderOverview({ game, awayCount, showSeconds, onAwayDismiss }) {
+export function renderOverview({ game, awayCount, showSeconds, demo, sharedMomentDate, onShare, onSaveReflection, onOpenArchive, onAwayDismiss }) {
   const now = Date.now();
   const countdown = createCountdown(showSeconds);
   const title = el('h1', { class: 'page-title' }, game.profile.name ? t('greetingNamed', { name: firstName(game.profile.name) }) : t('greeting'));
@@ -193,7 +307,17 @@ export function renderOverview({ game, awayCount, showSeconds, onAwayDismiss }) 
   const countdownCard = el(
     'section',
     { class: 'countdown-card' },
-    el('div', { class: 'countdown-head' }, countdownTitle, el('span', { class: 'pill fictional-pill' }, t('fictional'))),
+    el(
+      'div',
+      { class: 'countdown-head' },
+      countdownTitle,
+      el(
+        'div',
+        { class: 'countdown-tools' },
+        el('span', { class: 'pill fictional-pill' }, t('fictional')),
+        button(t('shareShort'), { class: 'btn btn-ghost btn-small countdown-share', onclick: () => onShare({ kind: 'days' }) }, icon('share', { size: 14 })),
+      ),
+    ),
     countdown,
     el(
       'div',
@@ -207,7 +331,10 @@ export function renderOverview({ game, awayCount, showSeconds, onAwayDismiss }) 
   const progress = progressCard(game, now);
   const next = nextMilestoneCard(game, now);
   const capsule = capsuleCard(game, now);
-  const glance = atAGlance(game, now);
+  const glance = atAGlance(game, now, demo);
+  const daily = dailyQuestionCard(game, sharedMomentDate, onShare, onSaveReflection, onOpenArchive);
+  const numbers = lifeNumbersCard(game, now, onShare);
+  const mosaic = yearMosaicCard(now);
 
   const away = awayCount > 0
     ? el(
@@ -230,8 +357,10 @@ export function renderOverview({ game, awayCount, showSeconds, onAwayDismiss }) 
     ),
     away,
     countdownCard,
+    daily,
     el('div', { class: 'overview-grid' }, progress.node, next.node),
     el('div', { class: 'overview-grid lower' }, capsule.node, glance),
+    el('div', { class: 'overview-grid perspective' }, numbers, mosaic),
   );
 
   function tick() {

@@ -4,7 +4,7 @@ import { t } from '../../core/i18n.js';
 import { capsulesDue } from '../../core/game.js';
 import { formatDateTime, formatNumber, formatShortDuration } from '../../core/format.js';
 
-function capsuleCard(capsule, now, { onOpenCapsule, onDeleteCapsule }, tickers) {
+function capsuleCard(capsule, now, { onOpenCapsule, onDeleteCapsule, onAddToCalendar }, tickers) {
   const opened = Boolean(capsule.openedAt);
   const due = !opened && capsule.openAt <= now;
   const status = el(
@@ -26,6 +26,12 @@ function capsuleCard(capsule, now, { onOpenCapsule, onDeleteCapsule }, tickers) 
     },
     icon(opened ? 'capsules' : 'arrow', { size: 15 }),
   );
+  const calendarButton = !opened && !due
+    ? button(t('addToCalendar'), {
+        class: 'btn btn-ghost btn-small',
+        onclick: () => onAddToCalendar(capsule),
+      }, icon('calendar', { size: 15 }))
+    : null;
   const readPreview = opened
     ? el('p', { class: 'capsule-excerpt' }, capsule.message)
     : el('p', { class: 'capsule-excerpt muted' }, t('capsuleSealedPreview'));
@@ -46,7 +52,12 @@ function capsuleCard(capsule, now, { onOpenCapsule, onDeleteCapsule }, tickers) 
     ),
     el('h3', { class: 'capsule-title' }, capsule.title),
     readPreview,
-    el('div', { class: 'capsule-foot' }, el('div', { class: 'capsule-dates' }, time, due ? null : countdown), openButton),
+    el(
+      'div',
+      { class: 'capsule-foot' },
+      el('div', { class: 'capsule-dates' }, time, due ? null : countdown),
+      el('div', { class: 'capsule-actions' }, calendarButton, openButton),
+    ),
   );
 
   tickers.push((current) => {
@@ -57,6 +68,7 @@ function capsuleCard(capsule, now, { onOpenCapsule, onDeleteCapsule }, tickers) 
       openButton.className = 'btn btn-small btn-primary';
       openButton.textContent = '';
       openButton.append(t('openCapsule'), icon('arrow', { size: 15 }));
+      calendarButton?.remove();
       status.className = 'state-pill is-ready';
       status.textContent = '';
       status.append(icon('capsules', { size: 14 }), t('readyLabel'));
@@ -70,7 +82,7 @@ function capsuleCard(capsule, now, { onOpenCapsule, onDeleteCapsule }, tickers) 
   return card;
 }
 
-export function renderCapsules({ game, onAddCapsule, onOpenCapsule, onDeleteCapsule }) {
+export function renderCapsules({ game, onAddCapsule, onOpenCapsule, onDeleteCapsule, onAddToCalendar }) {
   const now = Date.now();
   const tickers = [];
   const all = [...game.capsules].sort((a, b) => {
@@ -82,7 +94,7 @@ export function renderCapsules({ game, onAddCapsule, onOpenCapsule, onDeleteCaps
   const grid = el('div', { class: 'capsule-grid' });
 
   for (const capsule of all) {
-    grid.append(capsuleCard(capsule, now, { onOpenCapsule, onDeleteCapsule }, tickers));
+    grid.append(capsuleCard(capsule, now, { onOpenCapsule, onDeleteCapsule, onAddToCalendar }, tickers));
   }
 
   if (!all.length) {

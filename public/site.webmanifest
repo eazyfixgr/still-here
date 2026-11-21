@@ -1,7 +1,7 @@
 {
   "name": "Still Here",
   "short_name": "Still Here",
-  "description": "A real-time idle game about the passing of time.",
+  "description": "A quiet, local-first game about the time you have. See your days, keep a moment, answer one question.",
   "lang": "en",
   "dir": "ltr",
   "start_url": "./",

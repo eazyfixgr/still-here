@@ -148,6 +148,10 @@ export function createLocalPersistence(storage = defaultStorage(), clock = () =>
     return lastSavedAt;
   }
 
+  function hasGame() {
+    return Boolean(read(GAME_KEY) || read(LEGACY_KEY));
+  }
+
   return {
     loadGame,
     saveGame,
@@ -156,5 +160,6 @@ export function createLocalPersistence(storage = defaultStorage(), clock = () =>
     clear,
     getError,
     getLastSavedAt,
+    hasGame,
   };
 }

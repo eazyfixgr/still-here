@@ -2,9 +2,9 @@ import { button, el } from '../dom.js';
 import { icon } from '../icons.js';
 import { languageSelect } from '../components/language-select.js';
 import { t } from '../../core/i18n.js';
-import { APP_VERSION } from '../../core/constants.js';
 import { BASELINE_SOURCE_URL } from '../../data/baselines.js';
 import { baselineLabel, formatDate } from '../../core/format.js';
+import { FEEDBACK_URL, RELEASE, REPO_URL } from '../../config.js';
 
 const GREECE_SOURCE_URL =
   'https://www.statistics.gr/documents/20181/18740733/LivingConditions_1126.pdf/de0859ae-0de7-cbc0-a37e-559791f0f639';
@@ -17,6 +17,8 @@ function sexLabel(game) {
 
 export function renderSettings({
   game,
+  demo,
+  isInstalled,
   onNameChange,
   onThemeChange,
   onSecondsChange,
@@ -24,6 +26,10 @@ export function renderSettings({
   onExport,
   onImport,
   onReset,
+  onShare,
+  onCopyInvite,
+  onInstall,
+  onStartOwn,
 }) {
   const nameInput = el('input', {
     id: 'settings-name',
@@ -108,6 +114,29 @@ export function renderSettings({
       ),
       el(
         'section',
+        { class: 'settings-section span-two share-settings' },
+        el('h2', null, t('shareInviteTitle')),
+        el('p', { class: 'muted-copy' }, t('shareInviteCopy')),
+        el(
+          'div',
+          { class: 'button-row' },
+          button(t('shareDaysButton'), { class: 'btn btn-primary btn-small', onclick: () => onShare({ kind: 'days' }) }, icon('share', { size: 16 })),
+          button(t('shareMomentButton'), { class: 'btn btn-ghost btn-small', onclick: () => onShare({ kind: 'moment' }) }, icon('share', { size: 16 })),
+          button(t('shareLink'), { class: 'btn btn-ghost btn-small', onclick: onCopyInvite }, icon('copy', { size: 16 })),
+        ),
+      ),
+      el(
+        'section',
+        { class: 'settings-section span-two install-settings' },
+        el('h2', null, t('installTitle')),
+        el('p', { class: 'muted-copy' }, t('installCopy')),
+        isInstalled
+          ? el('p', { class: 'installed-note' }, icon('check', { size: 16 }), t('installInstalled'))
+          : el('div', { class: 'install-row' }, button(t('installButton'), { class: 'btn btn-ghost btn-small', onclick: onInstall }, icon('download', { size: 16 })), el('span', { class: 'field-hint' }, t('installHint'))),
+        isInstalled ? null : el('p', { class: 'field-hint' }, t('installUnsupported')),
+      ),
+      el(
+        'section',
         { class: 'settings-section span-two' },
         el('h2', null, t('profileTitle')),
         el('p', { class: 'muted-copy' }, t('profileCopy')),
@@ -131,30 +160,42 @@ export function renderSettings({
         ),
         el('p', { class: 'setup-note' }, t('profileLocked')),
       ),
-      el(
-        'section',
-        { class: 'settings-section' },
-        el('h2', null, t('dataTitle')),
-        el('p', { class: 'muted-copy' }, t('dataCopy')),
-        el(
-          'div',
-          { class: 'button-row' },
-          button(t('exportSave'), { class: 'btn btn-ghost btn-small', onclick: onExport }, icon('download', { size: 16 })),
-          button(t('importSave'), { class: 'btn btn-ghost btn-small', onclick: onImport }, icon('upload', { size: 16 })),
-        ),
-        el('p', { class: 'field-hint' }, t('backupNote')),
-      ),
-      el(
-        'section',
-        { class: 'settings-section danger-section' },
-        el('h2', null, t('resetTitle')),
-        el('p', { class: 'muted-copy' }, t('resetCopy')),
-        button(t('resetButton'), { class: 'btn btn-danger btn-small', onclick: onReset }, icon('reset', { size: 16 })),
-      ),
+      ...(demo
+        ? [
+            el(
+              'section',
+              { class: 'settings-section span-two demo-settings' },
+              el('h2', null, t('demoBannerTitle')),
+              el('p', { class: 'muted-copy' }, t('demoBannerCopy')),
+              button(t('demoStartMine'), { class: 'btn btn-primary', onclick: onStartOwn }, icon('arrow', { size: 16 })),
+            ),
+          ]
+        : [
+            el(
+              'section',
+              { class: 'settings-section' },
+              el('h2', null, t('dataTitle')),
+              el('p', { class: 'muted-copy' }, t('dataCopy')),
+              el(
+                'div',
+                { class: 'button-row' },
+                button(t('exportSave'), { class: 'btn btn-ghost btn-small', onclick: onExport }, icon('download', { size: 16 })),
+                button(t('importSave'), { class: 'btn btn-ghost btn-small', onclick: onImport }, icon('upload', { size: 16 })),
+              ),
+              el('p', { class: 'field-hint' }, t('backupNote')),
+            ),
+            el(
+              'section',
+              { class: 'settings-section danger-section' },
+              el('h2', null, t('resetTitle')),
+              el('p', { class: 'muted-copy' }, t('resetCopy')),
+              button(t('resetButton'), { class: 'btn btn-danger btn-small', onclick: onReset }, icon('reset', { size: 16 })),
+            ),
+          ]),
       el(
         'section',
         { class: 'settings-section span-two about-section', id: 'about' },
-        el('div', { class: 'about-head' }, el('div', { class: 'eyebrow' }, t('versionLabel', { version: APP_VERSION })), el('h2', null, t('aboutTitle'))),
+        el('div', { class: 'about-head' }, el('div', { class: 'eyebrow' }, t('versionLabel', { version: RELEASE })), el('h2', null, t('aboutTitle'))),
         el('p', { class: 'about-lede' }, t('aboutCopy')),
         el(
           'div',
@@ -175,6 +216,13 @@ export function renderSettings({
             el('a', { href: BASELINE_SOURCE_URL, target: '_blank', rel: 'noopener noreferrer' }, t('sourceLink'), icon('external', { size: 14 })),
             el('a', { href: GREECE_SOURCE_URL, target: '_blank', rel: 'noopener noreferrer' }, t('greeceSourceLink'), icon('external', { size: 14 })),
           ),
+        ),
+        el(
+          'div',
+          { class: 'about-links' },
+          el('a', { href: FEEDBACK_URL, target: '_blank', rel: 'noopener noreferrer' }, t('feedbackLink'), icon('external', { size: 14 })),
+          el('a', { href: REPO_URL, target: '_blank', rel: 'noopener noreferrer' }, t('sourceCode'), icon('external', { size: 14 })),
+          el('span', null, t('madeBy')),
         ),
         el('p', { class: 'setup-note disclaimer-note' }, t('entertainmentNote')),
       ),

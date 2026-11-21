@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://eazyfixgr.github.io/still-here/sitemap.xml
