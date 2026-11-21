@@ -1,0 +1,16 @@
+export const APP_VERSION = 2;
+export const GAME_MODEL = 'gompertz-game-v2';
+export const GAME_KEY = 'stillhere.game.v2';
+export const LEGACY_KEY = 'stillhere.game.v1';
+export const PREFS_KEY = 'stillhere.prefs.v2';
+export const DAY = 86400000;
+export const YEAR = 365.2425 * DAY;
+export const SAVE_LIMIT = 2000000;
+export const MAX_NAME = 40;
+export const MAX_CUSTOM_MILESTONES = 100;
+export const MAX_CAPSULES = 100;
+export const MAX_TITLE = 80;
+export const MAX_NOTE = 500;
+export const MAX_MESSAGE = 5000;
+export const DEFAULT_LOCALE = 'en';
+export const DEFAULT_THEME = 'dark';

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#10150f">
+  <meta name="description" content="Still Here is a local-first, real-time idle game about the passing of time. Start your clock, collect milestones and leave messages for your future self.">
+  <meta property="og:title" content="Still Here — Make time visible">
+  <meta property="og:description" content="A real-time idle game about the passing of time.">
+  <meta property="og:type" content="website">
+  <title>Still Here — Make time visible</title>
+  <link rel="icon" href="%BASE_URL%favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="%BASE_URL%site.webmanifest">
+  <link rel="apple-touch-icon" href="%BASE_URL%icon-192.png">
+  <script>
+    try {
+      const prefs = JSON.parse(localStorage.getItem('stillhere.prefs.v2') || '{}');
+      if (prefs.theme === 'light' || prefs.theme === 'dark') {
+        document.documentElement.dataset.theme = prefs.theme;
+        document.querySelector('meta[name="theme-color"]').content = prefs.theme === 'light' ? '#f4f2e8' : '#10150f';
+      }
+    } catch {}
+  </script>
+  <script type="module" src="/src/main.js"></script>
+</head>
+<body>
+  <noscript>
+    <div class="no-script">Still Here needs JavaScript to run. Enable JavaScript and reopen this page.</div>
+  </noscript>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div id="app"></div>
+  <div id="modal-root"></div>
+  <div id="toast-root" class="toast-stack" role="status" aria-live="polite"></div>
+</body>
+</html>

@@ -1,0 +1,266 @@
+@media (max-width: 980px) {
+  .wrap,
+  .app-header-inner,
+  .app-layout {
+    width: min(var(--max-width), calc(100% - 48px));
+  }
+
+  .app-header-inner {
+    min-height: 68px;
+  }
+}
+
+@media (max-width: 720px) {
+  .wrap,
+  .app-header-inner,
+  .app-layout {
+    width: min(var(--max-width), calc(100% - 38px));
+  }
+
+  .landing-header-inner {
+    min-height: 72px;
+  }
+
+  .header-actions {
+    gap: 6px;
+  }
+
+  .save-pill {
+    display: none;
+  }
+
+  .app-header .header-actions > a.icon-button {
+    display: none;
+  }
+
+  .language-select {
+    min-width: 88px;
+    max-width: 110px;
+    padding-right: 22px;
+    font-size: 0.71rem;
+  }
+
+  .app-layout {
+    padding-top: 22px;
+  }
+
+  .page-sub {
+    font-size: 0.86rem;
+  }
+
+  .card,
+  .settings-section {
+    border-radius: var(--radius-md);
+  }
+
+  .hero-tags {
+    margin-top: 24px;
+  }
+
+  .hero-lede {
+    font-size: 0.95rem;
+  }
+
+  .feature-card {
+    padding: 25px 22px;
+  }
+
+  .feature-card svg {
+    margin-bottom: 14px;
+  }
+
+  .setup-card {
+    border-radius: var(--radius-lg);
+  }
+
+  .step-dots i {
+    width: 14px;
+  }
+
+  .setup-footer .btn {
+    min-height: 42px;
+  }
+
+  .source-strip {
+    align-items: flex-start;
+    line-height: 1.5;
+  }
+
+  .source-strip .muted-separator {
+    display: none;
+  }
+
+  .review-list > div {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .review-list dd {
+    text-align: left;
+  }
+
+  .modal {
+    width: calc(100vw - 22px);
+  }
+
+  .modal[data-size="wide"] {
+    width: calc(100vw - 22px);
+  }
+}
+
+@media (max-width: 440px) {
+  .wrap,
+  .app-header-inner,
+  .app-layout {
+    width: min(var(--max-width), calc(100% - 28px));
+  }
+
+  .brand {
+    gap: 8px;
+    font-size: 1.2rem;
+  }
+
+  .brandmark {
+    width: 22px;
+    height: 26px;
+  }
+
+  .hero-title {
+    font-size: clamp(3rem, 15.5vw, 4.5rem);
+  }
+
+  .hero-tags span {
+    padding: 6px 9px;
+    font-size: 0.57rem;
+  }
+
+  .landing-header .icon-button,
+  .app-header .icon-button {
+    width: 37px;
+    height: 37px;
+  }
+
+  .setup-top {
+    padding: 17px 18px;
+  }
+
+  .setup-body {
+    padding: 19px 18px 6px;
+  }
+
+  .setup-footer {
+    padding: 13px 18px 18px;
+  }
+
+  .restore-row {
+    padding: 0 18px 18px;
+  }
+
+  .step-heading {
+    font-size: 1.45rem;
+  }
+
+  .step-sub {
+    font-size: 0.83rem;
+  }
+
+  .countdown-card {
+    padding: 21px 18px;
+  }
+
+  .countdown-value {
+    font-size: 2rem;
+  }
+
+  .countdown-grid {
+    gap: 18px 7px;
+  }
+
+  .next-body {
+    flex-direction: column;
+  }
+
+  .mobile-nav {
+    right: 7px;
+    bottom: 7px;
+    left: 7px;
+    padding: 5px;
+  }
+
+  .mobile-nav .nav-link {
+    font-size: 0.54rem;
+  }
+
+  .mobile-nav .nav-link svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  .settings-section {
+    padding: 19px;
+  }
+
+  .theme-choices {
+    gap: 6px;
+  }
+
+  .theme-choice {
+    min-height: 43px;
+    font-size: 0.72rem;
+  }
+
+  .about-section {
+    padding: 21px 18px;
+  }
+
+  .source-links {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .capsule-card {
+    padding: 17px;
+  }
+
+  .capsule-foot {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .capsule-foot .btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 360px) {
+  .wrap,
+  .app-header-inner,
+  .app-layout {
+    width: calc(100% - 22px);
+  }
+
+  .language-select {
+    min-width: 74px;
+    max-width: 84px;
+    padding-left: 8px;
+    padding-right: 18px;
+    font-size: 0.66rem;
+  }
+
+  .countdown-value {
+    font-size: 1.8rem;
+  }
+
+  .countdown-label {
+    font-size: 0.44rem;
+  }
+
+  .review-number {
+    font-size: 3.2rem;
+  }
+
+  .hero-title {
+    font-size: 2.8rem;
+  }
+}
