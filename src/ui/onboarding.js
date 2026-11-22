@@ -36,7 +36,7 @@ function landingHeader({ locale, theme, onLocaleChange, onThemeToggle }) {
   );
 }
 
-function heroCopy({ onStartHere, onDemo }) {
+function heroCopy({ onStartHere }) {
   return el(
     'div',
     { class: 'hero-copy' },
@@ -53,9 +53,7 @@ function heroCopy({ onStartHere, onDemo }) {
       'div',
       { class: 'hero-actions' },
       button(t('startHere'), { class: 'btn btn-primary btn-large', onclick: onStartHere }, icon('arrow', { size: 17 })),
-      button(t('tryDemo'), { class: 'btn btn-ghost btn-large', onclick: onDemo }, icon('play', { size: 15 })),
     ),
-    el('p', { class: 'demo-hint' }, t('demoHint')),
     el(
       'div',
       { class: 'hero-tags' },
@@ -338,7 +336,6 @@ export function renderOnboarding({
   onDraft,
   onStep,
   onStart,
-  onDemo,
   onShareMoment,
   onInfo,
   onLocaleChange,
@@ -359,7 +356,7 @@ export function renderOnboarding({
     window.setTimeout(() => root.querySelector('#player-name')?.focus({ preventScroll: true }), 350);
   };
   const sharedMoment = sharedMomentCard(sharedMomentDate, startHere, onShareMoment);
-  const heroPanel = heroCopy({ onStartHere: startHere, onDemo });
+  const heroPanel = heroCopy({ onStartHere: startHere });
   if (sharedMoment) heroPanel.append(sharedMoment);
   append(
     root,

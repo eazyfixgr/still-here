@@ -17,16 +17,11 @@ Live site: **https://eazyfixgr.github.io/still-here/**
 - Public question links (`?moment=YYYY-MM-DD`) that carry the language and the day, without exposing personal data.
 - Time capsules: sealed messages that unlock on a future date, with an `.ics` reminder.
 - A scenario lab for comparing a different rhythm without changing the active clock.
-- A full demo mode that can be explored without entering personal details.
 - English and Greek interfaces, with English as the default.
 - Night and daylight themes, reduced-motion support, accessible dialogs, and a responsive mobile layout.
 - Local JSON backup export and import.
 - Automatic migration of saves from the original single-file prototype.
 - Installable app shell with offline caching via a service worker.
-
-## Try before signing up
-
-The landing page has a **Try the demo** action. It builds an in-memory journey with sample data, so visitors can see the dashboard, milestones, capsules, questions, and share flow before filling in a form. Demo progress is never written to storage.
 
 ## Privacy
 

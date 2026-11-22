@@ -1,6 +1,6 @@
 {
   "name": "still-here",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "private": true,
   "type": "module",
   "description": "A quiet, local-first game about the time you have.",

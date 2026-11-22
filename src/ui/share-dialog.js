@@ -5,7 +5,7 @@ import { getLocale, t } from '../core/i18n.js';
 import { copyText, downloadBlob, shareContent } from '../core/sharing.js';
 import { canvasBlob, drawShareCard } from './share-card.js';
 
-export function openShareDialog(modal, { game, milestone, momentDate, sample = false, kind } = {}) {
+export function openShareDialog(modal, { game, milestone, momentDate, kind } = {}) {
   const options = { kind: kind ?? (milestone ? 'milestone' : game ? 'days' : 'moment'), format: 'square', theme: 'night' };
   const now = Date.now();
   let content;
@@ -46,12 +46,10 @@ export function openShareDialog(modal, { game, milestone, momentDate, sample = f
     imageButton.disabled = true;
     downloadButton.disabled = true;
     status.textContent = t('sharePreparing');
-    content = shareContent({ game, milestone, momentDate, sample, kind: options.kind, now });
+    content = shareContent({ game, milestone, momentDate, kind: options.kind, now });
     linkInput.value = content.url;
-    captionInput.value = content.sample
-      ? `${t('shareSampleCaption')} ${content.caption}`
-      : content.caption;
-    const caption = `${content.sample ? `${content.sampleLabel}. ` : ''}${content.eyebrow}. ${content.value} ${content.label}. ${content.message}`;
+    captionInput.value = content.caption;
+    const caption = `${content.eyebrow}. ${content.value} ${content.label}. ${content.message}`;
     canvas.setAttribute('aria-label', caption);
     description.textContent = caption;
     try {
@@ -84,7 +82,6 @@ export function openShareDialog(modal, { game, milestone, momentDate, sample = f
     control('share-format', t('shareFormat'), [['square', t('shareSquare')], ['story', t('shareStory')]], 'format'),
     control('share-theme', t('themeLabel'), [['night', t('shareNight')], ['paper', t('sharePaper')], ['ember', t('shareEmber')]], 'theme'),
     el('p', { class: 'share-privacy' }, icon('shield', { size: 17 }), t('sharePrivacy')),
-    sample ? el('p', { class: 'field-hint' }, t('shareDemoHint')) : null,
     captionField,
     el('div', { class: 'share-actions' }, imageButton, downloadButton),
     button(t('shareCopyCaption'), { class: 'btn btn-ghost btn-small', onclick: async () => {

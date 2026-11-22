@@ -1,4 +1,4 @@
-const CACHE_NAME = 'stillhere-v2.1.0';
+const CACHE_NAME = 'stillhere-v2.1.1';
 const CORE_ASSETS = ['./', './index.html', './site.webmanifest', './favicon.svg', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', (event) => {

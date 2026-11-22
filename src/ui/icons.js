@@ -11,7 +11,6 @@ const ICONS = {
     ['rect', { x: 3, y: 5, width: 18, height: 16, rx: 2 }],
     ['path', { d: 'M7 3v4M17 3v4M3 11h18M8 16h2M14 16h2' }],
   ],
-  play: [['path', { d: 'M8 4l12 8-12 8z' }]],
   overview: [
     ['circle', { cx: 12, cy: 12, r: 8.5 }],
     ['path', { d: 'M12 7.5v5l3 2' }],

@@ -17,7 +17,6 @@ function sexLabel(game) {
 
 export function renderSettings({
   game,
-  demo,
   isInstalled,
   onNameChange,
   onThemeChange,
@@ -29,7 +28,6 @@ export function renderSettings({
   onShare,
   onCopyInvite,
   onInstall,
-  onStartOwn,
 }) {
   const nameInput = el('input', {
     id: 'settings-name',
@@ -160,38 +158,26 @@ export function renderSettings({
         ),
         el('p', { class: 'setup-note' }, t('profileLocked')),
       ),
-      ...(demo
-        ? [
-            el(
-              'section',
-              { class: 'settings-section span-two demo-settings' },
-              el('h2', null, t('demoBannerTitle')),
-              el('p', { class: 'muted-copy' }, t('demoBannerCopy')),
-              button(t('demoStartMine'), { class: 'btn btn-primary', onclick: onStartOwn }, icon('arrow', { size: 16 })),
-            ),
-          ]
-        : [
-            el(
-              'section',
-              { class: 'settings-section' },
-              el('h2', null, t('dataTitle')),
-              el('p', { class: 'muted-copy' }, t('dataCopy')),
-              el(
-                'div',
-                { class: 'button-row' },
-                button(t('exportSave'), { class: 'btn btn-ghost btn-small', onclick: onExport }, icon('download', { size: 16 })),
-                button(t('importSave'), { class: 'btn btn-ghost btn-small', onclick: onImport }, icon('upload', { size: 16 })),
-              ),
-              el('p', { class: 'field-hint' }, t('backupNote')),
-            ),
-            el(
-              'section',
-              { class: 'settings-section danger-section' },
-              el('h2', null, t('resetTitle')),
-              el('p', { class: 'muted-copy' }, t('resetCopy')),
-              button(t('resetButton'), { class: 'btn btn-danger btn-small', onclick: onReset }, icon('reset', { size: 16 })),
-            ),
-          ]),
+      el(
+        'section',
+        { class: 'settings-section' },
+        el('h2', null, t('dataTitle')),
+        el('p', { class: 'muted-copy' }, t('dataCopy')),
+        el(
+          'div',
+          { class: 'button-row' },
+          button(t('exportSave'), { class: 'btn btn-ghost btn-small', onclick: onExport }, icon('download', { size: 16 })),
+          button(t('importSave'), { class: 'btn btn-ghost btn-small', onclick: onImport }, icon('upload', { size: 16 })),
+        ),
+        el('p', { class: 'field-hint' }, t('backupNote')),
+      ),
+      el(
+        'section',
+        { class: 'settings-section danger-section' },
+        el('h2', null, t('resetTitle')),
+        el('p', { class: 'muted-copy' }, t('resetCopy')),
+        button(t('resetButton'), { class: 'btn btn-danger btn-small', onclick: onReset }, icon('reset', { size: 16 })),
+      ),
       el(
         'section',
         { class: 'settings-section span-two about-section', id: 'about' },

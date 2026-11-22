@@ -1,5 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
+import { completeOnboarding } from './helpers.js';
 
 test.use({ reducedMotion: 'reduce' });
 
@@ -10,12 +11,11 @@ async function seriousViolations(page) {
   return result.violations.filter((violation) => ['serious', 'critical'].includes(violation.impact));
 }
 
-test('landing and demo have no serious accessibility violations', async ({ page }) => {
+test('landing and dashboard have no serious accessibility violations', async ({ page }) => {
   await page.goto('/');
   expect(await seriousViolations(page)).toEqual([]);
 
-  await page.getByRole('button', { name: 'Try the demo' }).click();
-  await expect(page.locator('.demo-banner')).toBeVisible();
+  await completeOnboarding(page, { goTo: false });
   expect(await seriousViolations(page)).toEqual([]);
 
   await page.locator('.app-header .icon-button').first().click();

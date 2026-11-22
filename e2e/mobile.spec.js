@@ -1,13 +1,15 @@
 import { expect, test } from '@playwright/test';
+import { completeOnboarding } from './helpers.js';
 
 test.use({ viewport: { width: 390, height: 844 } });
 
 test('keeps the public experience readable on a phone', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Try the demo' })).toHaveCount(0);
   expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBe(0);
 
-  await page.getByRole('button', { name: 'Try the demo' }).click();
+  await completeOnboarding(page, { goTo: false });
   await expect(page.locator('.mobile-nav')).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBe(0);
 
@@ -28,8 +30,7 @@ test('opens a shared question without horizontal overflow', async ({ page }) => 
 });
 
 test('lays out the share sheet for a phone screen', async ({ page }) => {
-  await page.goto('/');
-  await page.getByRole('button', { name: 'Try the demo' }).click();
+  await completeOnboarding(page);
   await page.locator('.countdown-share').click();
   await expect(page.locator('.modal[data-size="share"]')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Share image' })).toBeEnabled();

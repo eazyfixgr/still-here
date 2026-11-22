@@ -26,7 +26,6 @@ import {
 } from './core/game.js';
 import { syncAchievements } from './core/achievements.js';
 import { formatDate, formatDateTime, formatNumber } from './core/format.js';
-import { createDemo } from './core/demo.js';
 import { momentFor } from './core/moments.js';
 import { capsuleCalendar } from './core/calendar.js';
 import { copyText, downloadBlob, publicLink } from './core/sharing.js';
@@ -77,7 +76,6 @@ export class StillHereApp {
     this.activeView = null;
     this.lastTick = Date.now();
     this.timer = null;
-    this.demo = false;
     this.launchMomentDate = launchMomentDate;
     this.launchLocale = launchLocale;
     this.installPrompt = null;
@@ -167,7 +165,7 @@ export class StillHereApp {
   }
 
   persistGame() {
-    if (!this.game || this.demo) return false;
+    if (!this.game) return false;
     this.game.meta.lastSeen = Math.max(this.game.meta.lastSeen, Date.now());
     const ok = this.persistence.saveGame(this.game);
     if (!ok) this.warning = this.persistence.getError() || 'storageError';
@@ -176,7 +174,7 @@ export class StillHereApp {
   }
 
   flush() {
-    if (!this.game || this.demo) return;
+    if (!this.game) return;
     this.game.meta.lastSeen = Math.max(this.game.meta.lastSeen, Date.now());
     this.persistence.saveGame(this.game);
   }
@@ -203,7 +201,6 @@ export class StillHereApp {
           this.render({ focusStep: true });
         },
         onStart: () => this.startGame(),
-        onDemo: () => this.exploreDemo(),
         onShareMoment: (date) => this.shareNow({ kind: 'moment', momentDate: date }),
         onInfo: () => this.showInfo(),
         onLocaleChange: (code) => this.changeLocale(code),
@@ -225,8 +222,6 @@ export class StillHereApp {
       route: this.route,
       theme: this.theme,
       locale: getLocale(),
-      demo: this.demo,
-      onStartOwn: () => this.leaveDemo(),
       onLocaleChange: (code) => this.changeLocale(code),
       onThemeToggle: () => this.changeTheme(this.theme === 'dark' ? 'light' : 'dark'),
       storageError: this.warning,
@@ -246,7 +241,6 @@ export class StillHereApp {
         game: this.game,
         awayCount: this.awayCount,
         showSeconds: this.game.settings.showSeconds,
-        demo: this.demo,
         sharedMomentDate: this.launchMomentDate,
         onShare: (options) => this.shareNow(options),
         onSaveReflection: (date, text) => this.saveDailyReflection(date, text),
@@ -279,7 +273,6 @@ export class StillHereApp {
     }
     return renderSettings({
       game: this.game,
-      demo: this.demo,
       theme: this.theme,
       isInstalled: this.installed,
       onNameChange: (name) => this.changeName(name),
@@ -295,7 +288,6 @@ export class StillHereApp {
       onShare: (options) => this.shareNow(options),
       onCopyInvite: () => this.copyInviteLink(),
       onInstall: () => this.installApp(),
-      onStartOwn: () => this.leaveDemo(),
     });
   }
 
@@ -321,7 +313,6 @@ export class StillHereApp {
       return { ok: false, message: t('formInvalidBirth') };
     }
     const now = Date.now();
-    this.demo = false;
     this.game = created;
     syncAchievements(this.game, now);
     this.game.meta.lastSeen = now;
@@ -341,7 +332,6 @@ export class StillHereApp {
 
   restoreExisting(game) {
     const now = Date.now();
-    this.demo = false;
     this.game = game;
     this.game.meta.lastSeen = now;
     setLocale(this.game.settings.locale);
@@ -385,35 +375,11 @@ export class StillHereApp {
     });
   }
 
-  exploreDemo() {
-    const now = Date.now();
-    this.demo = true;
-    this.game = createDemo({ locale: getLocale(), theme: this.theme, showSeconds: true }, now);
-    this.game.meta.lastSeen = now;
-    this.awayCount = 0;
-    this.route = 'overview';
-    window.history.replaceState(null, '', '#/overview');
-    this.render({ focusMain: true });
-    window.scrollTo({ top: 0, behavior: 'auto' });
-    toast(t('demoStartToast'));
-  }
-
-  leaveDemo() {
-    this.demo = false;
-    this.game = null;
-    this.awayCount = 0;
-    this.route = 'overview';
-    window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}`);
-    this.render({ focusStep: true });
-    window.scrollTo({ top: 0, behavior: 'auto' });
-  }
-
   shareNow(options = {}) {
     openShareDialog(this.modal, {
       game: options.kind === 'moment' ? null : this.game,
       milestone: options.milestone,
       momentDate: options.momentDate ?? this.launchMomentDate,
-      sample: this.demo,
       kind: options.kind,
     });
   }
@@ -443,11 +409,7 @@ export class StillHereApp {
     this.persistGame();
     this.render();
     window.requestAnimationFrame(() => document.querySelector('.reflection-box summary')?.focus({ preventScroll: true }));
-    toast(this.demo
-      ? t('demoStartToast')
-      : !text.trim() && hadAnswer
-        ? t('reflectionRemoved')
-        : t('reflectionSaved'));
+    toast(!text.trim() && hadAnswer ? t('reflectionRemoved') : t('reflectionSaved'));
   }
 
   openReflectionArchive() {
@@ -800,7 +762,6 @@ export class StillHereApp {
       danger: true,
     });
     if (!confirmed) return;
-    this.demo = false;
     this.game = null;
     this.activeView = null;
     this.draft = freshDraft();

@@ -29,10 +29,10 @@ describe('sharing', () => {
     expect(content.url).toContain('eazyfixgr.github.io/still-here');
   });
 
-  it('marks demo cards and can share a moment or milestone', () => {
-    const moment = shareContent({ kind: 'moment', momentDate: '2026-11-10', sample: true, now: NOW });
-    expect(moment.sample).toBe(true);
+  it('can share a moment or a milestone without personal data', () => {
+    const moment = shareContent({ kind: 'moment', momentDate: '2026-11-10', now: NOW });
     expect(moment.caption).toMatch(/question/i);
+    expect(moment.caption).not.toContain('1990');
     const milestone = shareContent({
       game: { profile: { birth: '1990-05-12' } },
       kind: 'milestone',

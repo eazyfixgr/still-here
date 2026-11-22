@@ -20,7 +20,7 @@ export function publicLink({ locale = getLocale(), momentDate } = {}) {
   return url.href;
 }
 
-export function shareContent({ game, kind = 'days', milestone, momentDate, sample = false, now = Date.now() } = {}) {
+export function shareContent({ game, kind = 'days', milestone, momentDate, now = Date.now() } = {}) {
   const safeKind = kind === 'milestone' && milestone
     ? 'milestone'
     : kind === 'days' && game ? 'days' : 'moment';
@@ -31,8 +31,6 @@ export function shareContent({ game, kind = 'days', milestone, momentDate, sampl
     kind: safeKind,
     date: new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(now)),
     url: publicLink({ momentDate: safeKind === 'moment' ? moment.date : undefined }),
-    sample: Boolean(sample),
-    sampleLabel: t('demoLabel'),
     footer: t('shareCardFooter'),
     signature: t('shareCardSignature'),
     storyNote: t('shareStoryNote'),

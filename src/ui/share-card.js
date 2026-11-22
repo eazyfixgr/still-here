@@ -97,11 +97,6 @@ export function drawShareCard(canvas, content, { format = 'square', theme = 'nig
   ctx.fillStyle = palette.muted;
   ctx.font = `400 24px ${SANS}`;
   ctx.fillText(content.date, margin, headerY + 65);
-  if (content.sample) {
-    ctx.textAlign = 'right';
-    ctx.fillText(content.sampleLabel, width - margin, headerY + 4);
-    ctx.textAlign = 'left';
-  }
 
   const contentY = story ? 460 : 310;
   ctx.fillStyle = palette.accent;

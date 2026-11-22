@@ -65,12 +65,6 @@
   font-size: 0.88rem;
 }
 
-.demo-hint {
-  margin-top: 10px;
-  color: var(--muted-2);
-  font-size: 0.72rem;
-}
-
 .shared-moment {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -150,34 +144,6 @@
   color: var(--muted);
   font-family: var(--font-mono);
   font-size: 0.7rem;
-}
-
-.demo-banner {
-  display: flex;
-  align-items: center;
-  gap: 13px;
-  margin-bottom: 20px;
-  padding: 12px 15px;
-  border: 1px solid var(--accent-line);
-  border-radius: var(--radius-sm);
-  background: var(--accent-soft);
-}
-
-.demo-banner-copy {
-  display: grid;
-  gap: 2px;
-  flex: 1;
-  min-width: 0;
-}
-
-.demo-banner-copy strong {
-  color: var(--text);
-  font-size: 0.82rem;
-}
-
-.demo-banner-copy span {
-  color: var(--muted);
-  font-size: 0.75rem;
 }
 
 .daily-card {
@@ -538,10 +504,6 @@
   font-weight: 600;
 }
 
-.save-pill.is-demo .save-dot {
-  background: var(--orange);
-}
-
 .install-row {
   display: flex;
   align-items: center;
@@ -573,10 +535,6 @@
   align-items: center;
   gap: 5px;
   font-weight: 600;
-}
-
-.demo-settings .btn {
-  margin-top: 15px;
 }
 
 .modal[data-size="share"] {
@@ -687,14 +645,6 @@
     flex-direction: row;
   }
 
-  .demo-banner {
-    align-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  .demo-banner > .btn {
-    margin-left: 44px;
-  }
 }
 
 @media (max-width: 720px) {
@@ -830,8 +780,4 @@
     width: calc(100vw - 20px);
   }
 
-  .demo-banner > .btn {
-    margin-left: 0;
-    width: 100%;
-  }
 }

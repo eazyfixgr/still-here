@@ -273,7 +273,7 @@ function yearMosaicCard(now) {
   );
 }
 
-function atAGlance(game, now, demo) {
+function atAGlance(game, now) {
   const age = Math.floor(ageAt(now, game.profile.birth));
   const birthday = nextBirthdayMs(game.profile.birth, now);
   const birthdayDays = daysUntil(birthday, now);
@@ -285,7 +285,7 @@ function atAGlance(game, now, demo) {
   return el(
     'article',
     { class: 'card glance-card' },
-    el('div', { class: 'card-head' }, el('h2', null, t('thisJourney')), el('span', { class: 'pill' }, demo ? t('demoLabel') : t('savedLocally'))),
+    el('div', { class: 'card-head' }, el('h2', null, t('thisJourney')), el('span', { class: 'pill' }, t('savedLocally'))),
     el(
       'dl',
       { class: 'glance-list' },
@@ -297,7 +297,7 @@ function atAGlance(game, now, demo) {
   );
 }
 
-export function renderOverview({ game, awayCount, showSeconds, demo, sharedMomentDate, onShare, onSaveReflection, onOpenArchive, onAwayDismiss }) {
+export function renderOverview({ game, awayCount, showSeconds, sharedMomentDate, onShare, onSaveReflection, onOpenArchive, onAwayDismiss }) {
   const now = Date.now();
   const countdown = createCountdown(showSeconds);
   const title = el('h1', { class: 'page-title' }, game.profile.name ? t('greetingNamed', { name: firstName(game.profile.name) }) : t('greeting'));
@@ -331,7 +331,7 @@ export function renderOverview({ game, awayCount, showSeconds, demo, sharedMomen
   const progress = progressCard(game, now);
   const next = nextMilestoneCard(game, now);
   const capsule = capsuleCard(game, now);
-  const glance = atAGlance(game, now, demo);
+  const glance = atAGlance(game, now);
   const daily = dailyQuestionCard(game, sharedMomentDate, onShare, onSaveReflection, onOpenArchive);
   const numbers = lifeNumbersCard(game, now, onShare);
   const mosaic = yearMosaicCard(now);
